@@ -40,7 +40,7 @@ public class LoginController {
 				   && authentication.getPrincipal() != null
 				   && authentication.getPrincipal() instanceof User) {
 						userComponent.setLoggedUser((User) authentication.getPrincipal());
-				    }			
+				    }
 
 		if (!userComponent.isLoggedUser()) {
 			log.info("Not user logged");
