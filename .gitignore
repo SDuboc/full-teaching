@@ -9,3 +9,5 @@
 src/.project
 src/.classpath
 nbactions.xml
+/.idea
+/full-teaching.iml
