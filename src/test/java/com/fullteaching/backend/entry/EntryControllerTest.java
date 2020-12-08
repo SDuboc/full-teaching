@@ -5,6 +5,7 @@ import com.fullteaching.backend.course.Course;
 import com.fullteaching.backend.coursedetails.CourseDetails;
 import com.fullteaching.backend.coursedetails.CourseDetailsRepository;
 import com.fullteaching.backend.forum.Forum;
+import com.fullteaching.backend.forum.ForumRepository;
 import com.fullteaching.backend.security.AuthorizationService;
 import com.fullteaching.backend.user.User;
 import com.fullteaching.backend.user.UserComponent;
@@ -29,6 +30,9 @@ class EntryControllerTest {
 
     @InjectMocks
     public EntryController controller;
+
+    @Mock
+    private ForumRepository forumRepository;
 
     @Mock
     private CourseDetailsRepository courseDetailsRepository;
