@@ -1,10 +1,35 @@
 # FullTeaching
 
-### Branch específica para demontrar o que foi realizado no teste integrado
+### Branch específica para demonstrar o que foi realizado no teste de cobertura
 
-Public link da collection criada no postman: https://www.getpostman.com/collections/f7aca313ac99507f5732
+Após a escrita dos códigos de testes unitários nas classes de controllers do projeto, foi realizado um teste usando uma ferramenta de cobertura existente no InteliJ.<br>
 
-Os testes foram realizados sequencialmente.
+Para que possa ver toda a cobertura, foi importado um html contendo todos os detalhes necessários.<br>
+Este HTML está na pasta do projeto com o nome "Cobertura dos Testes".
+Para visualizá-lo, basta fazer o download desta pasta e abrir o documento com nome "index.html" dentro dela.
+<br>
+<br>
+Logo abaixo deixo alguns prints dos resultado que poderão ser encontrados na pasta citada a cima. 
 
-<p align="center"><img src="https://github.com/SDuboc/full-teaching/blob/teste-integrado/ReadmeImages/TestePostman.png?raw=true"/></p>
+#### Cobertura Classe Commnent
+<p align="center"><img src="https://github.com/SDuboc/full-teaching/blob/teste-estrutural/ReadmeImages/Comment-controller-cobertura.png"/></p>
 
+
+#### Cobertura Classe Entry
+<p align="center"><img src="https://github.com/SDuboc/full-teaching/blob/teste-estrutural/ReadmeImages/Entry-controller-cobertura.png"/></p>
+
+
+#### Cobertura Classe FileReader
+<p align="center"><img src="https://github.com/SDuboc/full-teaching/blob/teste-estrutural/ReadmeImages/FileReader-controller-cobertura.png"/></p>
+
+
+#### Cobertura Classe Forum
+<p align="center"><img src="https://github.com/SDuboc/full-teaching/blob/teste-estrutural/ReadmeImages/Forum-controller-cobertura.png"/></p>
+
+
+#### Cobertura Classe Security
+<p align="center"><img src="https://github.com/SDuboc/full-teaching/blob/teste-estrutural/ReadmeImages/Security-controller-cobertura.png"/></p>
+
+
+#### Cobertura total dos testes
+<p align="center"><img src="https://github.com/SDuboc/full-teaching/blob/teste-estrutural/ReadmeImages/cobertura-total-testes.png"/></p>
