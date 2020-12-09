@@ -1,0 +1,127 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: FileReader</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.fullteaching.backend.filereader</a> ]
+</div>
+
+<h1>Coverage Summary for Class: FileReader (com.fullteaching.backend.filereader)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileReader</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    9,5%
+  </span>
+  <span class="absValue">
+    (2/ 21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.fullteaching.backend.filereader;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.File;
+<i>4</i>&nbsp;import java.io.FileInputStream;
+<i>5</i>&nbsp;import java.io.IOException;
+<i>6</i>&nbsp;import java.io.InputStream;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import org.apache.tika.exception.TikaException;
+<i>9</i>&nbsp;import org.apache.tika.metadata.Metadata;
+<i>10</i>&nbsp;import org.apache.tika.parser.AutoDetectParser;
+<i>11</i>&nbsp;import org.apache.tika.parser.ParseContext;
+<i>12</i>&nbsp;import org.apache.tika.sax.BodyContentHandler;
+<i>13</i>&nbsp;import org.xml.sax.SAXException;
+<i>14</i>&nbsp;
+<b class="fc"><i>15</i>&nbsp;public class FileReader {</b>
+<i>16</i>&nbsp;	
+<i>17</i>&nbsp;	public String parseToPlainText(File file) throws Exception {
+<i>18</i>&nbsp;		
+<b class="fc"><i>19</i>&nbsp;		InputStream fileStream = new FileInputStream(file);</b>
+<b class="nc"><i>20</i>&nbsp;	    org.xml.sax.ContentHandler handler = new BodyContentHandler();</b>
+<b class="nc"><i>21</i>&nbsp;	    AutoDetectParser parser = new AutoDetectParser();</b>
+<b class="nc"><i>22</i>&nbsp;	    ParseContext context = new ParseContext();</b>
+<b class="nc"><i>23</i>&nbsp;	    Metadata metadata = new Metadata();</b>
+<i>24</i>&nbsp;	    
+<i>25</i>&nbsp;	    try {
+<b class="nc"><i>26</i>&nbsp;	    	System.out.println(&quot;Starting parsing...&quot;);</b>
+<b class="nc"><i>27</i>&nbsp;	        parser.parse(fileStream, handler, metadata, context);</b>
+<b class="nc"><i>28</i>&nbsp;	        System.out.println(&quot;Parsing finished...&quot;);</b>
+<b class="nc"><i>29</i>&nbsp;	        return handler.toString();</b>
+<i>30</i>&nbsp;	    }
+<b class="nc"><i>31</i>&nbsp;	    catch (IOException | SAXException | TikaException e) {</b>
+<b class="nc"><i>32</i>&nbsp;	    	System.out.println(&quot;Exception 1!&quot;);</b>
+<b class="nc"><i>33</i>&nbsp;			throw new Exception(&quot;TIKA was not able to exctract text of file &#39;&quot; + file.getName() + &quot;&#39;&quot;);</b>
+<i>34</i>&nbsp;		} finally {
+<b class="nc"><i>35</i>&nbsp;			try {</b>
+<b class="nc"><i>36</i>&nbsp;				System.out.println(&quot;Closing file...&quot;);</b>
+<b class="nc"><i>37</i>&nbsp;				fileStream.close();</b>
+<b class="nc"><i>38</i>&nbsp;			} catch (IOException e) {</b>
+<b class="nc"><i>39</i>&nbsp;				System.out.println(&quot;Exception 2!&quot;);</b>
+<b class="nc"><i>40</i>&nbsp;				throw new Exception(e);</b>
+<b class="nc"><i>41</i>&nbsp;			}</b>
+<b class="nc"><i>42</i>&nbsp;		}</b>
+<i>43</i>&nbsp;	}
+<i>44</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-12-09 02:49</div>
+</div>
+</body>
+</html>

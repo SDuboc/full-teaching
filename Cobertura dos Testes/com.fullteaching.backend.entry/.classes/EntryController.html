@@ -1,0 +1,174 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: EntryController</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.fullteaching.backend.entry</a> ]
+</div>
+
+<h1>Coverage Summary for Class: EntryController (com.fullteaching.backend.entry)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EntryController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (26/ 26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.fullteaching.backend.entry;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.slf4j.Logger;
+<i>4</i>&nbsp;import org.slf4j.LoggerFactory;
+<i>5</i>&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+<i>6</i>&nbsp;import org.springframework.http.HttpStatus;
+<i>7</i>&nbsp;import org.springframework.http.ResponseEntity;
+<i>8</i>&nbsp;import org.springframework.web.bind.annotation.PathVariable;
+<i>9</i>&nbsp;import org.springframework.web.bind.annotation.RequestBody;
+<i>10</i>&nbsp;import org.springframework.web.bind.annotation.RequestMapping;
+<i>11</i>&nbsp;import org.springframework.web.bind.annotation.RequestMethod;
+<i>12</i>&nbsp;import org.springframework.web.bind.annotation.RestController;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;import com.fullteaching.backend.forum.Forum;
+<i>15</i>&nbsp;import com.fullteaching.backend.forum.ForumRepository;
+<i>16</i>&nbsp;import com.fullteaching.backend.security.AuthorizationService;
+<i>17</i>&nbsp;import com.fullteaching.backend.coursedetails.CourseDetails;
+<i>18</i>&nbsp;import com.fullteaching.backend.coursedetails.CourseDetailsRepository;
+<i>19</i>&nbsp;import com.fullteaching.backend.user.User;
+<i>20</i>&nbsp;import com.fullteaching.backend.user.UserComponent;
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;@RestController
+<i>23</i>&nbsp;@RequestMapping(&quot;/api-entries&quot;)
+<b class="fc"><i>24</i>&nbsp;public class EntryController {</b>
+<i>25</i>&nbsp;	
+<b class="fc"><i>26</i>&nbsp;	private static final Logger log = LoggerFactory.getLogger(EntryController.class);</b>
+<i>27</i>&nbsp;	
+<i>28</i>&nbsp;	@Autowired
+<i>29</i>&nbsp;	private ForumRepository forumRepository;
+<i>30</i>&nbsp;	
+<i>31</i>&nbsp;	@Autowired
+<i>32</i>&nbsp;	private CourseDetailsRepository courseDetailsRepository;
+<i>33</i>&nbsp;	
+<i>34</i>&nbsp;	@Autowired
+<i>35</i>&nbsp;	private UserComponent user;
+<i>36</i>&nbsp;	
+<i>37</i>&nbsp;	@Autowired
+<i>38</i>&nbsp;	private AuthorizationService authorizationService;
+<i>39</i>&nbsp;	
+<i>40</i>&nbsp;	@RequestMapping(value = &quot;/forum/{id}&quot;, method = RequestMethod.POST)
+<i>41</i>&nbsp;	public ResponseEntity&lt;Object&gt; newEntry(@RequestBody Entry entry, @PathVariable(value=&quot;id&quot;) String courseDetailsId) {
+<i>42</i>&nbsp;		
+<b class="fc"><i>43</i>&nbsp;		log.info(&quot;CRUD operation: Adding new entry&quot;);</b>
+<i>44</i>&nbsp;		
+<b class="fc"><i>45</i>&nbsp;		ResponseEntity&lt;Object&gt; authorized = authorizationService.checkBackendLogged();</b>
+<b class="fc"><i>46</i>&nbsp;		if (authorized != null){</b>
+<b class="fc"><i>47</i>&nbsp;			return authorized;</b>
+<i>48</i>&nbsp;		};
+<i>49</i>&nbsp;		
+<b class="fc"><i>50</i>&nbsp;		long id_i = -1;</b>
+<i>51</i>&nbsp;		try {
+<b class="fc"><i>52</i>&nbsp;			id_i = Long.parseLong(courseDetailsId);</b>
+<b class="fc"><i>53</i>&nbsp;		} catch(NumberFormatException e){</b>
+<b class="fc"><i>54</i>&nbsp;			log.error(&quot;CourseDetails ID &#39;{}&#39; is not of type Long&quot;, courseDetailsId);</b>
+<b class="fc"><i>55</i>&nbsp;			return new ResponseEntity&lt;&gt;(HttpStatus.BAD_REQUEST);</b>
+<b class="fc"><i>56</i>&nbsp;		}</b>
+<i>57</i>&nbsp;		
+<b class="fc"><i>58</i>&nbsp;		CourseDetails cd = courseDetailsRepository.findById(id_i).orElse(null);</b>
+<i>59</i>&nbsp;		
+<b class="fc"><i>60</i>&nbsp;		ResponseEntity&lt;Object&gt; userAuthorized = authorizationService.checkAuthorizationUsers(cd, cd.getCourse().getAttenders());</b>
+<b class="fc"><i>61</i>&nbsp;		if (userAuthorized != null) { // If the user is not an attender of the course</b>
+<b class="fc"><i>62</i>&nbsp;			return userAuthorized;</b>
+<i>63</i>&nbsp;		} else {
+<i>64</i>&nbsp;		
+<b class="fc"><i>65</i>&nbsp;			Forum forum = cd.getForum();</b>
+<i>66</i>&nbsp;			
+<i>67</i>&nbsp;			//Setting the author of the entry
+<b class="fc"><i>68</i>&nbsp;			User userLogged = user.getLoggedUser();</b>
+<b class="fc"><i>69</i>&nbsp;			entry.setUser(userLogged);</b>
+<i>70</i>&nbsp;			
+<i>71</i>&nbsp;			//Setting the author and date of its first comment
+<b class="fc"><i>72</i>&nbsp;			entry.getComments().get(0).setUser(userLogged);</b>
+<b class="fc"><i>73</i>&nbsp;			entry.getComments().get(0).setDate(System.currentTimeMillis());</b>
+<i>74</i>&nbsp;			
+<i>75</i>&nbsp;			//Setting the date of the entry
+<b class="fc"><i>76</i>&nbsp;			entry.setDate(System.currentTimeMillis());</b>
+<i>77</i>&nbsp;			
+<b class="fc"><i>78</i>&nbsp;			forum.getEntries().add(entry);</b>
+<i>79</i>&nbsp;			/*Saving the modified forum: Cascade relationship between forum and entries
+<i>80</i>&nbsp;			  will add the new entry to EntryRepository*/
+<b class="fc"><i>81</i>&nbsp;			forumRepository.save(forum);</b>
+<i>82</i>&nbsp;			
+<b class="fc"><i>83</i>&nbsp;			log.info(&quot;New entry succesfully added: {}&quot;, entry.toString());</b>
+<i>84</i>&nbsp;			
+<i>85</i>&nbsp;			/*Entire forum is returned in order to have the new entry ID available just
+<i>86</i>&nbsp;			in case the author wants to add to it a new comment without refreshing the page*/
+<b class="fc"><i>87</i>&nbsp;			return new ResponseEntity&lt;&gt;(forum, HttpStatus.CREATED);</b>
+<i>88</i>&nbsp;		}
+<i>89</i>&nbsp;	}
+<i>90</i>&nbsp;
+<i>91</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-12-09 02:49</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,154 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LoginController</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.fullteaching.backend.security</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LoginController (com.fullteaching.backend.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoginController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86,4%
+  </span>
+  <span class="absValue">
+    (19/ 22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.fullteaching.backend.security;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import javax.servlet.http.HttpSession;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import org.slf4j.Logger;
+<i>6</i>&nbsp;import org.slf4j.LoggerFactory;
+<i>7</i>&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+<i>8</i>&nbsp;import org.springframework.http.HttpStatus;
+<i>9</i>&nbsp;import org.springframework.http.ResponseEntity;
+<i>10</i>&nbsp;import org.springframework.security.core.Authentication;
+<i>11</i>&nbsp;import org.springframework.security.core.context.SecurityContextHolder;
+<i>12</i>&nbsp;import org.springframework.web.bind.annotation.RequestMapping;
+<i>13</i>&nbsp;import org.springframework.web.bind.annotation.RestController;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;import com.fullteaching.backend.user.User;
+<i>16</i>&nbsp;import com.fullteaching.backend.user.UserComponent;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;/**
+<i>19</i>&nbsp; * This class is used to provide REST endpoints to logIn and logOut to the
+<i>20</i>&nbsp; * service. These endpoints are used by Angular 2 SPA client application.
+<i>21</i>&nbsp; * 
+<i>22</i>&nbsp; * NOTE: This class is not intended to be modified by app developer.
+<i>23</i>&nbsp; */
+<i>24</i>&nbsp;@RestController
+<b class="fc"><i>25</i>&nbsp;public class LoginController {</b>
+<i>26</i>&nbsp;
+<b class="fc"><i>27</i>&nbsp;	private static final Logger log = LoggerFactory.getLogger(LoginController.class);</b>
+<i>28</i>&nbsp;	
+<i>29</i>&nbsp;	@Autowired
+<i>30</i>&nbsp;	private UserComponent userComponent;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;	@RequestMapping(&quot;/api-logIn&quot;)
+<i>33</i>&nbsp;	public ResponseEntity&lt;User&gt; logIn() {
+<i>34</i>&nbsp;		
+<b class="fc"><i>35</i>&nbsp;		log.info(&quot;Logging in ...&quot;);</b>
+<i>36</i>&nbsp;		
+<i>37</i>&nbsp;
+<b class="fc"><i>38</i>&nbsp;		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</b>
+<b class="fc"><i>39</i>&nbsp;		if (authentication != null</b>
+<b class="nc"><i>40</i>&nbsp;				   &amp;&amp; authentication.getPrincipal() != null</b>
+<b class="nc"><i>41</i>&nbsp;				   &amp;&amp; authentication.getPrincipal() instanceof User) {</b>
+<b class="nc"><i>42</i>&nbsp;						userComponent.setLoggedUser((User) authentication.getPrincipal());</b>
+<i>43</i>&nbsp;				    }
+<i>44</i>&nbsp;
+<b class="fc"><i>45</i>&nbsp;		if (!userComponent.isLoggedUser()) {</b>
+<b class="fc"><i>46</i>&nbsp;			log.info(&quot;Not user logged&quot;);</b>
+<b class="fc"><i>47</i>&nbsp;			return new ResponseEntity&lt;&gt;(HttpStatus.UNAUTHORIZED);</b>
+<i>48</i>&nbsp;		} else {
+<b class="fc"><i>49</i>&nbsp;			User loggedUser = userComponent.getLoggedUser();</b>
+<b class="fc"><i>50</i>&nbsp;			log.info(&quot;Logged as {}&quot;, loggedUser.getName());</b>
+<b class="fc"><i>51</i>&nbsp;			return new ResponseEntity&lt;&gt;(loggedUser, HttpStatus.OK);</b>
+<i>52</i>&nbsp;		}
+<i>53</i>&nbsp;	}
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;	@RequestMapping(&quot;/api-logOut&quot;)
+<i>56</i>&nbsp;	public ResponseEntity&lt;Boolean&gt; logOut(HttpSession session) {
+<i>57</i>&nbsp;		
+<b class="fc"><i>58</i>&nbsp;		log.info(&quot;Logging out...&quot;);</b>
+<i>59</i>&nbsp;
+<b class="fc"><i>60</i>&nbsp;		if (!userComponent.isLoggedUser()) {</b>
+<b class="fc"><i>61</i>&nbsp;			log.info(&quot;No user logged&quot;);</b>
+<b class="fc"><i>62</i>&nbsp;			return new ResponseEntity&lt;&gt;(HttpStatus.UNAUTHORIZED);</b>
+<i>63</i>&nbsp;		} else {
+<b class="fc"><i>64</i>&nbsp;			String name = userComponent.getLoggedUser().getName();</b>
+<b class="fc"><i>65</i>&nbsp;			session.invalidate();</b>
+<b class="fc"><i>66</i>&nbsp;			log.info(&quot;Logged out user {}&quot;, name);</b>
+<b class="fc"><i>67</i>&nbsp;			return new ResponseEntity&lt;&gt;(true, HttpStatus.OK);</b>
+<i>68</i>&nbsp;		}
+<i>69</i>&nbsp;	}
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-12-09 02:49</div>
+</div>
+</body>
+</html>

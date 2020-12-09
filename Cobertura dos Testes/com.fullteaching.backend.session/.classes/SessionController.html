@@ -1,0 +1,234 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SessionController</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.fullteaching.backend.session</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SessionController (com.fullteaching.backend.session)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SessionController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 60)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.fullteaching.backend.session;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.slf4j.Logger;
+<i>4</i>&nbsp;import org.slf4j.LoggerFactory;
+<i>5</i>&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+<i>6</i>&nbsp;import org.springframework.http.HttpStatus;
+<i>7</i>&nbsp;import org.springframework.http.ResponseEntity;
+<i>8</i>&nbsp;import org.springframework.web.bind.annotation.PathVariable;
+<i>9</i>&nbsp;import org.springframework.web.bind.annotation.RequestBody;
+<i>10</i>&nbsp;import org.springframework.web.bind.annotation.RequestMapping;
+<i>11</i>&nbsp;import org.springframework.web.bind.annotation.RequestMethod;
+<i>12</i>&nbsp;import org.springframework.web.bind.annotation.RestController;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;import com.fullteaching.backend.course.Course;
+<i>15</i>&nbsp;import com.fullteaching.backend.course.CourseRepository;
+<i>16</i>&nbsp;import com.fullteaching.backend.security.AuthorizationService;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;@RestController
+<i>19</i>&nbsp;@RequestMapping(&quot;/api-sessions&quot;)
+<b class="nc"><i>20</i>&nbsp;public class SessionController {</b>
+<i>21</i>&nbsp;	
+<b class="nc"><i>22</i>&nbsp;	private static final Logger log = LoggerFactory.getLogger(SessionController.class);</b>
+<i>23</i>&nbsp;	
+<i>24</i>&nbsp;	@Autowired
+<i>25</i>&nbsp;	private CourseRepository courseRepository;
+<i>26</i>&nbsp;	
+<i>27</i>&nbsp;	@Autowired
+<i>28</i>&nbsp;	private SessionRepository sessionRepository;
+<i>29</i>&nbsp;	
+<i>30</i>&nbsp;	@Autowired
+<i>31</i>&nbsp;	private AuthorizationService authorizationService;
+<i>32</i>&nbsp;	
+<i>33</i>&nbsp;	@RequestMapping(value = &quot;/course/{id}&quot;, method = RequestMethod.POST)
+<i>34</i>&nbsp;	public ResponseEntity&lt;Object&gt; newSession(@RequestBody Session session, @PathVariable(value=&quot;id&quot;) String id) {
+<i>35</i>&nbsp;		
+<b class="nc"><i>36</i>&nbsp;		log.info(&quot;CRUD operation: Adding new session&quot;);</b>
+<i>37</i>&nbsp;		
+<b class="nc"><i>38</i>&nbsp;		ResponseEntity&lt;Object&gt; authorized = authorizationService.checkBackendLogged();</b>
+<b class="nc"><i>39</i>&nbsp;		if (authorized != null){</b>
+<b class="nc"><i>40</i>&nbsp;			return authorized;</b>
+<i>41</i>&nbsp;		};
+<i>42</i>&nbsp;		
+<b class="nc"><i>43</i>&nbsp;		long id_i = -1;</b>
+<i>44</i>&nbsp;		try {
+<b class="nc"><i>45</i>&nbsp;			id_i = Long.parseLong(id);</b>
+<b class="nc"><i>46</i>&nbsp;		} catch(NumberFormatException e){</b>
+<b class="nc"><i>47</i>&nbsp;			log.error(&quot;Session ID &#39;{}&#39; is not of type Long&quot;, id);</b>
+<b class="nc"><i>48</i>&nbsp;			return new ResponseEntity&lt;&gt;(HttpStatus.BAD_REQUEST);</b>
+<b class="nc"><i>49</i>&nbsp;		}</b>
+<i>50</i>&nbsp;		
+<b class="nc"><i>51</i>&nbsp;		Course course = courseRepository.findById(id_i).orElse(null);</b>
+<i>52</i>&nbsp;		
+<b class="nc"><i>53</i>&nbsp;		ResponseEntity&lt;Object&gt; teacherAuthorized = authorizationService.checkAuthorization(course, course.getTeacher());</b>
+<b class="nc"><i>54</i>&nbsp;		if (teacherAuthorized != null) { // If the user is not the teacher of the course</b>
+<b class="nc"><i>55</i>&nbsp;			return teacherAuthorized;</b>
+<i>56</i>&nbsp;		} else {
+<i>57</i>&nbsp;			//Bi-directional saving
+<b class="nc"><i>58</i>&nbsp;			session.setCourse(course);</b>
+<b class="nc"><i>59</i>&nbsp;			course.getSessions().add(session);</b>
+<i>60</i>&nbsp;			
+<i>61</i>&nbsp;			//Saving the modified course: Cascade relationship between course and sessions
+<i>62</i>&nbsp;			//will add the new session to SessionRepository
+<b class="nc"><i>63</i>&nbsp;			courseRepository.save(course);</b>
+<i>64</i>&nbsp;			
+<b class="nc"><i>65</i>&nbsp;			log.info(&quot;New session succesfully added: {}&quot;, session.toString());</b>
+<i>66</i>&nbsp;			
+<i>67</i>&nbsp;			//Entire course is returned
+<b class="nc"><i>68</i>&nbsp;			return new ResponseEntity&lt;&gt;(course, HttpStatus.CREATED);</b>
+<i>69</i>&nbsp;		}
+<i>70</i>&nbsp;	}
+<i>71</i>&nbsp;	
+<i>72</i>&nbsp;	
+<i>73</i>&nbsp;	@RequestMapping(value = &quot;/edit&quot;, method = RequestMethod.PUT)
+<i>74</i>&nbsp;	public ResponseEntity&lt;Object&gt; modifySession(@RequestBody Session session) {
+<i>75</i>&nbsp;		
+<b class="nc"><i>76</i>&nbsp;		log.info(&quot;CRUD operation: Updating session&quot;);</b>
+<i>77</i>&nbsp;		
+<b class="nc"><i>78</i>&nbsp;		ResponseEntity&lt;Object&gt; authorized = authorizationService.checkBackendLogged();</b>
+<b class="nc"><i>79</i>&nbsp;		if (authorized != null){</b>
+<b class="nc"><i>80</i>&nbsp;			return authorized;</b>
+<i>81</i>&nbsp;		};
+<i>82</i>&nbsp;		
+<b class="nc"><i>83</i>&nbsp;		Session s = sessionRepository.findById(session.getId()).orElse(null);</b>
+<i>84</i>&nbsp;		
+<b class="nc"><i>85</i>&nbsp;		log.info(&quot;Updating session. Previous value: {}&quot;, s.toString());</b>
+<i>86</i>&nbsp;		
+<b class="nc"><i>87</i>&nbsp;		ResponseEntity&lt;Object&gt; teacherAuthorized = authorizationService.checkAuthorization(s, s.getCourse().getTeacher());</b>
+<b class="nc"><i>88</i>&nbsp;		if (teacherAuthorized != null) { // If the user is not the teacher of the course</b>
+<b class="nc"><i>89</i>&nbsp;			return teacherAuthorized;</b>
+<i>90</i>&nbsp;		} else {
+<b class="nc"><i>91</i>&nbsp;			s.setTitle(session.getTitle());</b>
+<b class="nc"><i>92</i>&nbsp;			s.setDescription(session.getDescription());</b>
+<b class="nc"><i>93</i>&nbsp;			s.setDate(session.getDate());</b>
+<i>94</i>&nbsp;			//Saving the modified session
+<b class="nc"><i>95</i>&nbsp;			sessionRepository.save(s);</b>
+<i>96</i>&nbsp;			
+<b class="nc"><i>97</i>&nbsp;			log.info(&quot;Session succesfully updated. Modified value: {}&quot;, session.toString());</b>
+<i>98</i>&nbsp;			
+<b class="nc"><i>99</i>&nbsp;			return new ResponseEntity&lt;&gt;(s, HttpStatus.OK);</b>
+<i>100</i>&nbsp;		}
+<i>101</i>&nbsp;	}
+<i>102</i>&nbsp;	
+<i>103</i>&nbsp;	
+<i>104</i>&nbsp;	@RequestMapping(value = &quot;/delete/{id}&quot;, method = RequestMethod.DELETE)
+<i>105</i>&nbsp;	public ResponseEntity&lt;Object&gt; deleteSession(@PathVariable(value=&quot;id&quot;) String id) {
+<i>106</i>&nbsp;		
+<b class="nc"><i>107</i>&nbsp;		log.info(&quot;CRUD operation: Deleting session&quot;);</b>
+<i>108</i>&nbsp;		
+<b class="nc"><i>109</i>&nbsp;		ResponseEntity&lt;Object&gt; authorized = authorizationService.checkBackendLogged();</b>
+<b class="nc"><i>110</i>&nbsp;		if (authorized != null){</b>
+<b class="nc"><i>111</i>&nbsp;			return authorized;</b>
+<i>112</i>&nbsp;		};
+<i>113</i>&nbsp;		
+<b class="nc"><i>114</i>&nbsp;		long id_i = -1;</b>
+<i>115</i>&nbsp;		try{
+<b class="nc"><i>116</i>&nbsp;			id_i = Long.parseLong(id);</b>
+<b class="nc"><i>117</i>&nbsp;		}catch(NumberFormatException e){</b>
+<b class="nc"><i>118</i>&nbsp;			log.error(&quot;Session ID &#39;{}&#39; is not of type Long&quot;, id);</b>
+<b class="nc"><i>119</i>&nbsp;			return new ResponseEntity&lt;&gt;(HttpStatus.BAD_REQUEST);</b>
+<b class="nc"><i>120</i>&nbsp;		}</b>
+<i>121</i>&nbsp;		
+<b class="nc"><i>122</i>&nbsp;		Session session = sessionRepository.findById(id_i).orElse(null);</b>
+<i>123</i>&nbsp;		
+<b class="nc"><i>124</i>&nbsp;		ResponseEntity&lt;Object&gt; teacherAuthorized = authorizationService.checkAuthorization(session, session.getCourse().getTeacher());</b>
+<b class="nc"><i>125</i>&nbsp;		if (teacherAuthorized != null) { // If the user is not the teacher of the course</b>
+<b class="nc"><i>126</i>&nbsp;			return teacherAuthorized;</b>
+<i>127</i>&nbsp;		} else {
+<i>128</i>&nbsp;		
+<b class="nc"><i>129</i>&nbsp;			Course course = courseRepository.findById(session.getCourse().getId()).orElse(null);</b>
+<b class="nc"><i>130</i>&nbsp;			if (course != null){</b>
+<i>131</i>&nbsp;				
+<b class="nc"><i>132</i>&nbsp;				log.info(&quot;Deleting session: {}&quot;, session.toString());</b>
+<i>133</i>&nbsp;				
+<b class="nc"><i>134</i>&nbsp;				course.getSessions().remove(session);</b>
+<b class="nc"><i>135</i>&nbsp;				sessionRepository.deleteById(id_i);</b>
+<b class="nc"><i>136</i>&nbsp;				courseRepository.save(course);</b>
+<i>137</i>&nbsp;				
+<b class="nc"><i>138</i>&nbsp;				log.info(&quot;Session successfully deleted&quot;);</b>
+<i>139</i>&nbsp;				
+<b class="nc"><i>140</i>&nbsp;				return new ResponseEntity&lt;&gt;(session, HttpStatus.OK);</b>
+<i>141</i>&nbsp;			}
+<i>142</i>&nbsp;			else {
+<i>143</i>&nbsp;				//The Course that owns the deleted session does not exist
+<i>144</i>&nbsp;				//This code is presumed to be unreachable, because of the Cascade.ALL relationship from Course to Session
+<b class="nc"><i>145</i>&nbsp;				sessionRepository.delete(session);</b>
+<b class="nc"><i>146</i>&nbsp;				return new ResponseEntity&lt;&gt;(HttpStatus.BAD_REQUEST);</b>
+<i>147</i>&nbsp;			}
+<i>148</i>&nbsp;		}
+<i>149</i>&nbsp;	}
+<i>150</i>&nbsp;	
+<i>151</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-12-09 02:49</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,166 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SecurityConfig</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.fullteaching.backend.security</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SecurityConfig (com.fullteaching.backend.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SecurityConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.fullteaching.backend.security;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+<i>4</i>&nbsp;import org.springframework.context.annotation.Configuration;
+<i>5</i>&nbsp;import org.springframework.http.HttpMethod;
+<i>6</i>&nbsp;import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+<i>7</i>&nbsp;import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+<i>8</i>&nbsp;import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;/**
+<i>11</i>&nbsp; * Security configuration. In this class can be configured several aspects
+<i>12</i>&nbsp; * related to security:
+<i>13</i>&nbsp; * Security behavior: Login method, session management, CSRF, etc..
+<i>14</i>&nbsp; * Authentication provider: Responsible to authenticate users. In this
+<i>15</i>&nbsp; * example, we use an instance of UserRepositoryAuthProvider, that authenticate
+<i>16</i>&nbsp; * users stored in a Spring Data database.
+<i>17</i>&nbsp; * URL Access Authorization: Access to http URLs depending on Authenticated
+<i>18</i>&nbsp; * vs anonymous users and also based on user role.
+<i>19</i>&nbsp; * 
+<i>20</i>&nbsp; * 
+<i>21</i>&nbsp; * NOTE: The only part of this class intended for app developer customization is
+<i>22</i>&nbsp; * the method configureUrlAuthorization. App developer should
+<i>23</i>&nbsp; * decide what URLs are accessible by what user role.
+<i>24</i>&nbsp; */
+<i>25</i>&nbsp;@Configuration
+<b class="nc"><i>26</i>&nbsp;public class SecurityConfig extends WebSecurityConfigurerAdapter {</b>
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;	@Autowired
+<i>29</i>&nbsp;	public UserRepositoryAuthProvider userRepoAuthProvider;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;	@Override
+<i>32</i>&nbsp;	protected void configure(HttpSecurity http) throws Exception {
+<i>33</i>&nbsp;
+<b class="nc"><i>34</i>&nbsp;		configureUrlAuthorization(http);</b>
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;		// Use Http Basic Authentication
+<b class="nc"><i>37</i>&nbsp;		http.httpBasic();</b>
+<i>38</i>&nbsp;		
+<i>39</i>&nbsp;     
+<i>40</i>&nbsp;		// Do not redirect when logout
+<b class="nc"><i>41</i>&nbsp;		http.logout().logoutSuccessHandler((rq, rs, a) -&gt; {</b>
+<b class="nc"><i>42</i>&nbsp;		});</b>
+<b class="nc"><i>43</i>&nbsp;	}</b>
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;	private void configureUrlAuthorization(HttpSecurity http) throws Exception {
+<i>46</i>&nbsp;		
+<b class="nc"><i>47</i>&nbsp;		http.csrf().disable().authorizeRequests().antMatchers(&quot;/assets/pictures/*&quot;).authenticated();</b>
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;		// APP: This rules have to be changed by app developer
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;		// URLs that need authentication to access to it
+<i>52</i>&nbsp;		//Courses API
+<b class="nc"><i>53</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.GET, &quot;/courses/**&quot;).hasAnyRole(&quot;TEACHER&quot;, &quot;STUDENT&quot;);</b>
+<b class="nc"><i>54</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.POST, &quot;/courses/**&quot;).hasRole(&quot;TEACHER&quot;);</b>
+<b class="nc"><i>55</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.PUT, &quot;/courses/**&quot;).hasRole(&quot;TEACHER&quot;);</b>
+<b class="nc"><i>56</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.DELETE, &quot;/courses/**&quot;).hasRole(&quot;TEACHER&quot;);</b>
+<i>57</i>&nbsp;		//Forum API
+<b class="nc"><i>58</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.POST, &quot;/entries/**&quot;).hasAnyRole(&quot;TEACHER&quot;, &quot;STUDENT&quot;);</b>
+<b class="nc"><i>59</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.POST, &quot;/comments/**&quot;).hasAnyRole(&quot;TEACHER&quot;, &quot;STUDENT&quot;);</b>
+<i>60</i>&nbsp;		//Session API
+<b class="nc"><i>61</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.POST, &quot;/sessions/**&quot;).hasRole(&quot;TEACHER&quot;);</b>
+<b class="nc"><i>62</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.PUT, &quot;/sessions/**&quot;).hasRole(&quot;TEACHER&quot;);</b>
+<b class="nc"><i>63</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.DELETE, &quot;/sessions/**&quot;).hasRole(&quot;TEACHER&quot;);</b>
+<i>64</i>&nbsp;		//Files API
+<b class="nc"><i>65</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.POST, &quot;/files/**&quot;).hasRole(&quot;TEACHER&quot;);</b>
+<b class="nc"><i>66</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.PUT, &quot;/files/**&quot;).hasRole(&quot;TEACHER&quot;);</b>
+<b class="nc"><i>67</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.DELETE, &quot;/files/**&quot;).hasRole(&quot;TEACHER&quot;);</b>
+<i>68</i>&nbsp;		//Files upload/download API
+<b class="nc"><i>69</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.POST, &quot;/load-files/upload/course/**&quot;).hasRole(&quot;TEACHER&quot;);</b>
+<b class="nc"><i>70</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.POST, &quot;/load-files/upload/picture/**&quot;).hasAnyRole(&quot;TEACHER&quot;, &quot;STUDENT&quot;);</b>
+<b class="nc"><i>71</i>&nbsp;		http.authorizeRequests().antMatchers(HttpMethod.GET, &quot;/load-files/course/**&quot;).hasAnyRole(&quot;TEACHER&quot;, &quot;STUDENT&quot;);</b>
+<i>72</i>&nbsp;		
+<i>73</i>&nbsp;		// Other URLs can be accessed without authentication
+<b class="nc"><i>74</i>&nbsp;		http.authorizeRequests().anyRequest().permitAll();</b>
+<b class="nc"><i>75</i>&nbsp;	}</b>
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;	@Override
+<i>78</i>&nbsp;	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;		// Database authentication provider
+<b class="nc"><i>81</i>&nbsp;		auth.authenticationProvider(userRepoAuthProvider);</b>
+<b class="nc"><i>82</i>&nbsp;	}</b>
+<i>83</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-12-09 02:49</div>
+</div>
+</body>
+</html>

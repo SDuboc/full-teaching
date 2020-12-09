@@ -1,0 +1,464 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: CourseController</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.fullteaching.backend.course</a> ]
+</div>
+
+<h1>Coverage Summary for Class: CourseController (com.fullteaching.backend.course)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CourseController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 158)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CourseController$1</td>
+  </tr>
+  <tr>
+    <td class="name">CourseController$AddAttendersResponse</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 159)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.fullteaching.backend.course;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.Arrays;
+<i>4</i>&nbsp;import java.util.Collection;
+<i>5</i>&nbsp;import java.util.HashSet;
+<i>6</i>&nbsp;import java.util.Set;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import org.apache.commons.validator.routines.EmailValidator;
+<i>9</i>&nbsp;import org.slf4j.Logger;
+<i>10</i>&nbsp;import org.slf4j.LoggerFactory;
+<i>11</i>&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+<i>12</i>&nbsp;import org.springframework.http.HttpStatus;
+<i>13</i>&nbsp;import org.springframework.http.ResponseEntity;
+<i>14</i>&nbsp;import org.springframework.web.bind.annotation.PathVariable;
+<i>15</i>&nbsp;import org.springframework.web.bind.annotation.RequestBody;
+<i>16</i>&nbsp;import org.springframework.web.bind.annotation.RequestMapping;
+<i>17</i>&nbsp;import org.springframework.web.bind.annotation.RequestMethod;
+<i>18</i>&nbsp;import org.springframework.web.bind.annotation.RestController;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;import com.fullteaching.backend.user.UserComponent;
+<i>21</i>&nbsp;import com.fullteaching.backend.user.UserRepository;
+<i>22</i>&nbsp;import com.fasterxml.jackson.annotation.JsonView;
+<i>23</i>&nbsp;import com.fullteaching.backend.course.Course.SimpleCourseList;
+<i>24</i>&nbsp;import com.fullteaching.backend.security.AuthorizationService;
+<i>25</i>&nbsp;import com.fullteaching.backend.user.User;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;@RestController
+<i>28</i>&nbsp;@RequestMapping(&quot;/api-courses&quot;)
+<b class="nc"><i>29</i>&nbsp;public class CourseController {</b>
+<i>30</i>&nbsp;	
+<b class="nc"><i>31</i>&nbsp;	private static final Logger log = LoggerFactory.getLogger(CourseController.class);</b>
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;	@Autowired
+<i>34</i>&nbsp;	private CourseRepository courseRepository;
+<i>35</i>&nbsp;	
+<i>36</i>&nbsp;	@Autowired
+<i>37</i>&nbsp;	private UserRepository userRepository;
+<i>38</i>&nbsp;	
+<i>39</i>&nbsp;	@Autowired
+<i>40</i>&nbsp;	private UserComponent user;
+<i>41</i>&nbsp;	
+<i>42</i>&nbsp;	@Autowired
+<i>43</i>&nbsp;	private AuthorizationService authorizationService;
+<i>44</i>&nbsp;	
+<b class="nc"><i>45</i>&nbsp;	private class AddAttendersResponse {</b>
+<i>46</i>&nbsp;		public Collection&lt;User&gt; attendersAdded;
+<i>47</i>&nbsp;		public Collection&lt;User&gt; attendersAlreadyAdded;
+<i>48</i>&nbsp;		public Collection&lt;String&gt; emailsInvalid;
+<i>49</i>&nbsp;		public Collection&lt;String&gt; emailsValidNotRegistered;
+<i>50</i>&nbsp;	}
+<i>51</i>&nbsp;	
+<i>52</i>&nbsp;	@JsonView(SimpleCourseList.class)
+<i>53</i>&nbsp;	@RequestMapping(value = &quot;/user/{id}&quot;, method = RequestMethod.GET)
+<i>54</i>&nbsp;	public ResponseEntity&lt;Object&gt; getCourses(@PathVariable(value=&quot;id&quot;) String id) {
+<i>55</i>&nbsp;		
+<b class="nc"><i>56</i>&nbsp;		log.info(&quot;CRUD operation: Getting all user courses&quot;);</b>
+<i>57</i>&nbsp;		
+<b class="nc"><i>58</i>&nbsp;		ResponseEntity&lt;Object&gt; authorized = authorizationService.checkBackendLogged();</b>
+<b class="nc"><i>59</i>&nbsp;		if (authorized != null){</b>
+<b class="nc"><i>60</i>&nbsp;			return authorized;</b>
+<i>61</i>&nbsp;		};
+<i>62</i>&nbsp;		
+<b class="nc"><i>63</i>&nbsp;		long id_i = -1;</b>
+<i>64</i>&nbsp;		try{
+<b class="nc"><i>65</i>&nbsp;			id_i = Long.parseLong(id);</b>
+<b class="nc"><i>66</i>&nbsp;		}catch(NumberFormatException e){</b>
+<b class="nc"><i>67</i>&nbsp;			log.error(&quot;User ID &#39;{}&#39; is not of type Long&quot;, id);</b>
+<b class="nc"><i>68</i>&nbsp;			return new ResponseEntity&lt;&gt;(HttpStatus.BAD_REQUEST);</b>
+<b class="nc"><i>69</i>&nbsp;		}</b>
+<b class="nc"><i>70</i>&nbsp;		Set&lt;Long&gt; s = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>71</i>&nbsp;		s.add(id_i);</b>
+<b class="nc"><i>72</i>&nbsp;		Collection&lt;User&gt; users = userRepository.findAllById(s);</b>
+<b class="nc"><i>73</i>&nbsp;		Collection&lt;Course&gt; courses = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>74</i>&nbsp;		courses = courseRepository.findByAttenders(users);</b>
+<b class="nc"><i>75</i>&nbsp;		return new ResponseEntity&lt;&gt;(courses, HttpStatus.OK);</b>
+<i>76</i>&nbsp;	}
+<i>77</i>&nbsp;	
+<i>78</i>&nbsp;	@RequestMapping(value = &quot;/course/{id}&quot;, method = RequestMethod.GET)
+<i>79</i>&nbsp;	public ResponseEntity&lt;Object&gt; getCourse(@PathVariable(value=&quot;id&quot;) String id) {
+<i>80</i>&nbsp;		
+<b class="nc"><i>81</i>&nbsp;		log.info(&quot;CRUD operation: Getting one course&quot;);</b>
+<i>82</i>&nbsp;		
+<b class="nc"><i>83</i>&nbsp;		ResponseEntity&lt;Object&gt; authorized = authorizationService.checkBackendLogged();</b>
+<b class="nc"><i>84</i>&nbsp;		if (authorized != null){</b>
+<b class="nc"><i>85</i>&nbsp;			return authorized;</b>
+<i>86</i>&nbsp;		};
+<i>87</i>&nbsp;		
+<b class="nc"><i>88</i>&nbsp;		long id_i = -1;</b>
+<i>89</i>&nbsp;		try{
+<b class="nc"><i>90</i>&nbsp;			id_i = Long.parseLong(id);</b>
+<b class="nc"><i>91</i>&nbsp;		}catch(NumberFormatException e){</b>
+<b class="nc"><i>92</i>&nbsp;			log.error(&quot;Course ID &#39;{}&#39; is not of type Long&quot;, id);</b>
+<b class="nc"><i>93</i>&nbsp;			return new ResponseEntity&lt;&gt;(HttpStatus.BAD_REQUEST);</b>
+<b class="nc"><i>94</i>&nbsp;		}</b>
+<b class="nc"><i>95</i>&nbsp;		Course course = courseRepository.findById(id_i).orElse(null);</b>
+<b class="nc"><i>96</i>&nbsp;		return new ResponseEntity&lt;&gt;(course ,HttpStatus.OK);</b>
+<i>97</i>&nbsp;	}
+<i>98</i>&nbsp;	
+<i>99</i>&nbsp;	@RequestMapping(value = &quot;/new&quot;, method = RequestMethod.POST)
+<i>100</i>&nbsp;	public ResponseEntity&lt;Object&gt; newCourse(@RequestBody Course course) {
+<i>101</i>&nbsp;		
+<b class="nc"><i>102</i>&nbsp;		log.info(&quot;CRUD operation: Adding new course&quot;);</b>
+<i>103</i>&nbsp;		
+<b class="nc"><i>104</i>&nbsp;		ResponseEntity&lt;Object&gt; authorized = authorizationService.checkBackendLogged();</b>
+<b class="nc"><i>105</i>&nbsp;		if (authorized != null){</b>
+<b class="nc"><i>106</i>&nbsp;			return authorized;</b>
+<i>107</i>&nbsp;		};
+<i>108</i>&nbsp;		
+<b class="nc"><i>109</i>&nbsp;		User userLogged = user.getLoggedUser();</b>
+<i>110</i>&nbsp;		
+<i>111</i>&nbsp;		//Updating course (&#39;teacher&#39;, &#39;attenders&#39;)
+<b class="nc"><i>112</i>&nbsp;		course.setTeacher(userLogged);</b>
+<b class="nc"><i>113</i>&nbsp;		course.getAttenders().add(userLogged);</b>
+<i>114</i>&nbsp;		
+<i>115</i>&nbsp;		/*Saving the new course: Course entity is the owner of the relationships
+<i>116</i>&nbsp;		Course-Teacher, Course-User, Course-CourseDetails. Teacher, User and CourseDetails
+<i>117</i>&nbsp;		tables don&#39;t need to be updated (they will automatically be)*/
+<b class="nc"><i>118</i>&nbsp;		courseRepository.save(course);</b>
+<b class="nc"><i>119</i>&nbsp;		courseRepository.flush();</b>
+<i>120</i>&nbsp;		
+<b class="nc"><i>121</i>&nbsp;		course = courseRepository.findById(course.getId()).orElse(null);</b>
+<i>122</i>&nbsp;		
+<b class="nc"><i>123</i>&nbsp;		log.info(&quot;New course succesfully added: {}&quot;, course.toString());</b>
+<i>124</i>&nbsp;		
+<b class="nc"><i>125</i>&nbsp;		return new ResponseEntity&lt;&gt;(course, HttpStatus.CREATED);</b>
+<i>126</i>&nbsp;	}
+<i>127</i>&nbsp;	
+<i>128</i>&nbsp;	@RequestMapping(value = &quot;/edit&quot;, method = RequestMethod.PUT)
+<i>129</i>&nbsp;	public ResponseEntity&lt;Object&gt; modifyCourse(@RequestBody Course course) {
+<i>130</i>&nbsp;		
+<b class="nc"><i>131</i>&nbsp;		log.info(&quot;CRUD operation: Updating course&quot;);</b>
+<i>132</i>&nbsp;		
+<b class="nc"><i>133</i>&nbsp;		ResponseEntity&lt;Object&gt; authorized = authorizationService.checkBackendLogged();</b>
+<b class="nc"><i>134</i>&nbsp;		if (authorized != null){</b>
+<b class="nc"><i>135</i>&nbsp;			return authorized;</b>
+<i>136</i>&nbsp;		};
+<i>137</i>&nbsp;
+<b class="nc"><i>138</i>&nbsp;		Course c = courseRepository.findById(course.getId()).orElse(null);</b>
+<i>139</i>&nbsp;		
+<b class="nc"><i>140</i>&nbsp;		ResponseEntity&lt;Object&gt; teacherAuthorized = authorizationService.checkAuthorization(c, c.getTeacher());</b>
+<b class="nc"><i>141</i>&nbsp;		if (teacherAuthorized != null) { // If the user is not the teacher of the course</b>
+<b class="nc"><i>142</i>&nbsp;			return teacherAuthorized;</b>
+<i>143</i>&nbsp;		} else {
+<b class="nc"><i>144</i>&nbsp;			log.info(&quot;Updating course. Previous value: {}&quot;, c.toString());</b>
+<i>145</i>&nbsp;			
+<i>146</i>&nbsp;			//Modifying the course attributes
+<b class="nc"><i>147</i>&nbsp;			c.setImage(course.getImage());</b>
+<b class="nc"><i>148</i>&nbsp;			c.setTitle(course.getTitle());</b>
+<b class="nc"><i>149</i>&nbsp;			if (course.getCourseDetails() != null){</b>
+<b class="nc"><i>150</i>&nbsp;				if (course.getCourseDetails().getInfo() != null){</b>
+<b class="nc"><i>151</i>&nbsp;					c.getCourseDetails().setInfo(course.getCourseDetails().getInfo());</b>
+<i>152</i>&nbsp;				}
+<i>153</i>&nbsp;			}
+<i>154</i>&nbsp;			//Saving the modified course
+<b class="nc"><i>155</i>&nbsp;			courseRepository.save(c);</b>
+<i>156</i>&nbsp;			
+<b class="nc"><i>157</i>&nbsp;			log.info(&quot;Course succesfully updated. Modified value: {}&quot;, c.toString());</b>
+<i>158</i>&nbsp;			
+<b class="nc"><i>159</i>&nbsp;			return new ResponseEntity&lt;&gt;(c, HttpStatus.OK);</b>
+<i>160</i>&nbsp;		}
+<i>161</i>&nbsp;	}
+<i>162</i>&nbsp;	
+<i>163</i>&nbsp;	@RequestMapping(value = &quot;/delete/{courseId}&quot;, method = RequestMethod.DELETE)
+<i>164</i>&nbsp;	public ResponseEntity&lt;Object&gt; deleteCourse(@PathVariable(value=&quot;courseId&quot;) String courseId) {
+<i>165</i>&nbsp;		
+<b class="nc"><i>166</i>&nbsp;		log.info(&quot;CRUD operation: Deleting course&quot;);</b>
+<i>167</i>&nbsp;		
+<b class="nc"><i>168</i>&nbsp;		ResponseEntity&lt;Object&gt; authorized = authorizationService.checkBackendLogged();</b>
+<b class="nc"><i>169</i>&nbsp;		if (authorized != null){</b>
+<b class="nc"><i>170</i>&nbsp;			return authorized;</b>
+<i>171</i>&nbsp;		};
+<i>172</i>&nbsp;		
+<b class="nc"><i>173</i>&nbsp;		long id_course = -1;</b>
+<i>174</i>&nbsp;		try{
+<b class="nc"><i>175</i>&nbsp;			id_course = Long.parseLong(courseId);</b>
+<b class="nc"><i>176</i>&nbsp;		}catch(NumberFormatException e){</b>
+<b class="nc"><i>177</i>&nbsp;			log.error(&quot;Course ID &#39;{}&#39; is not of type Long&quot;, courseId);</b>
+<b class="nc"><i>178</i>&nbsp;			return new ResponseEntity&lt;&gt;(HttpStatus.BAD_REQUEST);</b>
+<b class="nc"><i>179</i>&nbsp;		}</b>
+<i>180</i>&nbsp;		
+<b class="nc"><i>181</i>&nbsp;		Course c = courseRepository.findById(id_course).orElse(null);</b>
+<i>182</i>&nbsp;		
+<b class="nc"><i>183</i>&nbsp;		ResponseEntity&lt;Object&gt; teacherAuthorized = authorizationService.checkAuthorization(c, c.getTeacher());</b>
+<b class="nc"><i>184</i>&nbsp;		if (teacherAuthorized != null) { // If the user is not the teacher of the course</b>
+<b class="nc"><i>185</i>&nbsp;			return teacherAuthorized;</b>
+<i>186</i>&nbsp;		} else {
+<i>187</i>&nbsp;			
+<b class="nc"><i>188</i>&nbsp;			log.info(&quot;Deleting course: {}&quot;, c.toString());</b>
+<i>189</i>&nbsp;			
+<i>190</i>&nbsp;			//Removing the deleted course from its attenders
+<b class="nc"><i>191</i>&nbsp;			Collection&lt;Course&gt; courses = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>192</i>&nbsp;			courses.add(c);</b>
+<b class="nc"><i>193</i>&nbsp;			Collection&lt;User&gt; users = userRepository.findByCourses(courses);</b>
+<b class="nc"><i>194</i>&nbsp;			for(User u: users){</b>
+<b class="nc"><i>195</i>&nbsp;				u.getCourses().remove(c);</b>
+<b class="nc"><i>196</i>&nbsp;			}</b>
+<b class="nc"><i>197</i>&nbsp;			userRepository.saveAll(users);</b>
+<b class="nc"><i>198</i>&nbsp;			c.getAttenders().clear();</b>
+<i>199</i>&nbsp;			
+<b class="nc"><i>200</i>&nbsp;			courseRepository.delete(c);</b>
+<i>201</i>&nbsp;			
+<b class="nc"><i>202</i>&nbsp;			log.info(&quot;Course successfully deleted&quot;);</b>
+<i>203</i>&nbsp;			
+<b class="nc"><i>204</i>&nbsp;			return new ResponseEntity&lt;&gt;(c, HttpStatus.OK);</b>
+<i>205</i>&nbsp;		}
+<i>206</i>&nbsp;	}
+<i>207</i>&nbsp;	
+<i>208</i>&nbsp;
+<i>209</i>&nbsp;	
+<i>210</i>&nbsp;	@RequestMapping(value = &quot;/edit/add-attenders/course/{courseId}&quot;, method = RequestMethod.PUT)
+<i>211</i>&nbsp;	public ResponseEntity&lt;Object&gt; addAttenders(
+<i>212</i>&nbsp;			@RequestBody String[] attenderEmails, 
+<i>213</i>&nbsp;			@PathVariable(value=&quot;courseId&quot;) String courseId) 
+<i>214</i>&nbsp;	{
+<i>215</i>&nbsp;		
+<b class="nc"><i>216</i>&nbsp;		log.info(&quot;CRUD operation: Adding attenders to course&quot;);</b>
+<i>217</i>&nbsp;		
+<b class="nc"><i>218</i>&nbsp;		ResponseEntity&lt;Object&gt; authorized = authorizationService.checkBackendLogged();</b>
+<b class="nc"><i>219</i>&nbsp;		if (authorized != null){</b>
+<b class="nc"><i>220</i>&nbsp;			return authorized;</b>
+<i>221</i>&nbsp;		};
+<i>222</i>&nbsp;		
+<b class="nc"><i>223</i>&nbsp;		long id_course = -1;</b>
+<i>224</i>&nbsp;		try{
+<b class="nc"><i>225</i>&nbsp;			id_course = Long.parseLong(courseId);</b>
+<b class="nc"><i>226</i>&nbsp;		}catch(NumberFormatException e) {</b>
+<b class="nc"><i>227</i>&nbsp;			log.error(&quot;Course ID &#39;{}&#39; is not of type Long&quot;, courseId);</b>
+<b class="nc"><i>228</i>&nbsp;			return new ResponseEntity&lt;&gt;(HttpStatus.BAD_REQUEST);</b>
+<b class="nc"><i>229</i>&nbsp;		}</b>
+<i>230</i>&nbsp;
+<b class="nc"><i>231</i>&nbsp;		Course c = courseRepository.findById(id_course).orElse(null);</b>
+<i>232</i>&nbsp;		
+<b class="nc"><i>233</i>&nbsp;		ResponseEntity&lt;Object&gt; teacherAuthorized = authorizationService.checkAuthorization(c, c.getTeacher());</b>
+<b class="nc"><i>234</i>&nbsp;		if (teacherAuthorized != null) { // If the user is not the teacher of the course</b>
+<b class="nc"><i>235</i>&nbsp;			return teacherAuthorized;</b>
+<i>236</i>&nbsp;		} else {
+<i>237</i>&nbsp;			
+<b class="nc"><i>238</i>&nbsp;			log.info(&quot;Adding attenders {} to course {}&quot;, Arrays.toString(attenderEmails), c.toString());</b>
+<i>239</i>&nbsp;		
+<i>240</i>&nbsp;			//Strings with a valid email format
+<b class="nc"><i>241</i>&nbsp;			Set&lt;String&gt; attenderEmailsValid = new HashSet&lt;&gt;();</b>
+<i>242</i>&nbsp;			//Strings with an invalid email format
+<b class="nc"><i>243</i>&nbsp;			Set&lt;String&gt; attenderEmailsInvalid = new HashSet&lt;&gt;();</b>
+<i>244</i>&nbsp;			//Strings with a valid email format but no registered in the application
+<b class="nc"><i>245</i>&nbsp;			Set&lt;String&gt; attenderEmailsNotRegistered = new HashSet&lt;&gt;();</b>
+<i>246</i>&nbsp;			
+<b class="nc"><i>247</i>&nbsp;			EmailValidator emailValidator = EmailValidator.getInstance();</b>
+<i>248</i>&nbsp;			
+<b class="nc"><i>249</i>&nbsp;			for (int i = 0; i &lt; attenderEmails.length; i++){</b>
+<b class="nc"><i>250</i>&nbsp;				if (emailValidator.isValid(attenderEmails[i])) {</b>
+<b class="nc"><i>251</i>&nbsp;					attenderEmailsValid.add(attenderEmails[i]);</b>
+<i>252</i>&nbsp;				} else {
+<b class="nc"><i>253</i>&nbsp;					attenderEmailsInvalid.add(attenderEmails[i]);</b>
+<i>254</i>&nbsp;				}
+<i>255</i>&nbsp;			}
+<i>256</i>&nbsp;			
+<b class="nc"><i>257</i>&nbsp;			Collection&lt;User&gt; newPossibleAttenders = userRepository.findByNameIn(attenderEmailsValid);</b>
+<b class="nc"><i>258</i>&nbsp;			Collection&lt;User&gt; newAddedAttenders = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>259</i>&nbsp;			Collection&lt;User&gt; alreadyAddedAttenders = new HashSet&lt;&gt;();</b>
+<i>260</i>&nbsp;			
+<b class="nc"><i>261</i>&nbsp;			for (String s : attenderEmailsValid){</b>
+<b class="nc"><i>262</i>&nbsp;				if (!this.userListContainsEmail(newPossibleAttenders, s)){</b>
+<b class="nc"><i>263</i>&nbsp;					attenderEmailsNotRegistered.add(s);</b>
+<i>264</i>&nbsp;				}
+<b class="nc"><i>265</i>&nbsp;			}</b>
+<i>266</i>&nbsp;			
+<b class="nc"><i>267</i>&nbsp;			for (User attender : newPossibleAttenders){</b>
+<b class="nc"><i>268</i>&nbsp;				boolean newAtt = true;</b>
+<b class="nc"><i>269</i>&nbsp;				if (!attender.getCourses().contains(c)) attender.getCourses().add(c); else newAtt = false;</b>
+<b class="nc"><i>270</i>&nbsp;				if (!c.getAttenders().contains(attender)) c.getAttenders().add(attender); else newAtt = false;</b>
+<b class="nc"><i>271</i>&nbsp;				if (newAtt) newAddedAttenders.add(attender); else alreadyAddedAttenders.add(attender);</b>
+<b class="nc"><i>272</i>&nbsp;			}</b>
+<i>273</i>&nbsp;			
+<i>274</i>&nbsp;			//Saving the attenders (all of them, just in case a field of the bidirectional relationship is missing in a Course or a User)
+<b class="nc"><i>275</i>&nbsp;			userRepository.saveAll(newPossibleAttenders);	</b>
+<i>276</i>&nbsp;			//Saving the modified course
+<b class="nc"><i>277</i>&nbsp;			courseRepository.save(c);</b>
+<i>278</i>&nbsp;			
+<b class="nc"><i>279</i>&nbsp;			AddAttendersResponse customResponse = new AddAttendersResponse();</b>
+<b class="nc"><i>280</i>&nbsp;			customResponse.attendersAdded = newAddedAttenders;</b>
+<b class="nc"><i>281</i>&nbsp;			customResponse.attendersAlreadyAdded = alreadyAddedAttenders;</b>
+<b class="nc"><i>282</i>&nbsp;			customResponse.emailsInvalid = attenderEmailsInvalid;</b>
+<b class="nc"><i>283</i>&nbsp;			customResponse.emailsValidNotRegistered = attenderEmailsNotRegistered;</b>
+<i>284</i>&nbsp;			
+<b class="nc"><i>285</i>&nbsp;			log.info(&quot;Attenders added: {} | Attenders already exist: {} | Emails not valid: {} | Emails valid but no registered: {}&quot;,</b>
+<i>286</i>&nbsp;					customResponse.attendersAdded,
+<i>287</i>&nbsp;					customResponse.attendersAlreadyAdded,
+<i>288</i>&nbsp;					customResponse.emailsInvalid,
+<i>289</i>&nbsp;					customResponse.emailsValidNotRegistered);
+<i>290</i>&nbsp;			
+<b class="nc"><i>291</i>&nbsp;			return new ResponseEntity&lt;&gt;(customResponse, HttpStatus.OK);</b>
+<i>292</i>&nbsp;		}
+<i>293</i>&nbsp;	}
+<i>294</i>&nbsp;	
+<i>295</i>&nbsp;	
+<i>296</i>&nbsp;	
+<i>297</i>&nbsp;	@RequestMapping(value = &quot;/edit/delete-attenders&quot;, method = RequestMethod.PUT)
+<i>298</i>&nbsp;	public ResponseEntity&lt;Object&gt; deleteAttenders(@RequestBody Course course) {
+<i>299</i>&nbsp;		
+<b class="nc"><i>300</i>&nbsp;		log.info(&quot;CRUD operation: Deleting attender from course&quot;);</b>
+<i>301</i>&nbsp;		
+<b class="nc"><i>302</i>&nbsp;		ResponseEntity&lt;Object&gt; authorized = authorizationService.checkBackendLogged();</b>
+<b class="nc"><i>303</i>&nbsp;		if (authorized != null){</b>
+<b class="nc"><i>304</i>&nbsp;			return authorized;</b>
+<i>305</i>&nbsp;		};
+<i>306</i>&nbsp;
+<b class="nc"><i>307</i>&nbsp;		Course c = courseRepository.findById(course.getId()).orElse(null);</b>
+<i>308</i>&nbsp;		
+<b class="nc"><i>309</i>&nbsp;		ResponseEntity&lt;Object&gt; teacherAuthorized = authorizationService.checkAuthorization(c, c.getTeacher());</b>
+<b class="nc"><i>310</i>&nbsp;		if (teacherAuthorized != null) { // If the user is not the teacher of the course</b>
+<b class="nc"><i>311</i>&nbsp;			return teacherAuthorized;</b>
+<i>312</i>&nbsp;		} else {
+<i>313</i>&nbsp;			
+<b class="nc"><i>314</i>&nbsp;			log.info(&quot;Deleting attender from course {}&quot;, c);</b>
+<i>315</i>&nbsp;		
+<b class="nc"><i>316</i>&nbsp;			Set&lt;Course&gt; setCourse = new HashSet&lt;&gt;();</b>
+<b class="nc"><i>317</i>&nbsp;			setCourse.add(c);</b>
+<b class="nc"><i>318</i>&nbsp;			Collection&lt;User&gt; courseAttenders = userRepository.findByCourses(setCourse);</b>
+<i>319</i>&nbsp;			
+<b class="nc"><i>320</i>&nbsp;			for (User attender : courseAttenders){</b>
+<b class="nc"><i>321</i>&nbsp;				if (!course.getAttenders().contains(attender)){</b>
+<b class="nc"><i>322</i>&nbsp;					attender.getCourses().remove(c);</b>
+<b class="nc"><i>323</i>&nbsp;					log.info(&quot;Attender &#39;{}&#39; succesfully deleted from course&quot;, attender.getNickName());</b>
+<i>324</i>&nbsp;				}
+<b class="nc"><i>325</i>&nbsp;			}</b>
+<i>326</i>&nbsp;			
+<b class="nc"><i>327</i>&nbsp;			userRepository.saveAll(courseAttenders);</b>
+<i>328</i>&nbsp;			
+<i>329</i>&nbsp;			//Modifying the course attenders
+<b class="nc"><i>330</i>&nbsp;			c.setAttenders(course.getAttenders());</b>
+<i>331</i>&nbsp;			//Saving the modified course
+<b class="nc"><i>332</i>&nbsp;			courseRepository.save(c);</b>
+<b class="nc"><i>333</i>&nbsp;			return new ResponseEntity&lt;&gt;(c.getAttenders(), HttpStatus.OK);</b>
+<i>334</i>&nbsp;		}
+<i>335</i>&nbsp;	}
+<i>336</i>&nbsp;	
+<i>337</i>&nbsp;	//Checks if a User collection contains a user with certain email
+<i>338</i>&nbsp;	private boolean userListContainsEmail(Collection&lt;User&gt; users, String email){
+<b class="nc"><i>339</i>&nbsp;		boolean isContained = false;</b>
+<b class="nc"><i>340</i>&nbsp;		for (User u : users){</b>
+<b class="nc"><i>341</i>&nbsp;			if (u.getName().equals(email)) {</b>
+<b class="nc"><i>342</i>&nbsp;				isContained = true;</b>
+<b class="nc"><i>343</i>&nbsp;				break;</b>
+<i>344</i>&nbsp;			}
+<b class="nc"><i>345</i>&nbsp;		}</b>
+<b class="nc"><i>346</i>&nbsp;		return isContained;</b>
+<i>347</i>&nbsp;	}
+<i>348</i>&nbsp;	
+<i>349</i>&nbsp;}
+<i>350</i>&nbsp;
+<i>351</i>&nbsp;	
+<i>352</i>&nbsp;	
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-12-09 02:49</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: UserRepository</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.fullteaching.backend.user</a> ]
+</div>
+
+<h1>Coverage Summary for Class: UserRepository (com.fullteaching.backend.user)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">UserRepository</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.fullteaching.backend.user;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.Collection;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import org.springframework.data.jpa.repository.JpaRepository;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import com.fullteaching.backend.course.Course;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;public interface UserRepository extends JpaRepository&lt;User, Long&gt;{
+<i>10</i>&nbsp;	
+<i>11</i>&nbsp;	public User findByName(String name);
+<i>12</i>&nbsp;	
+<i>13</i>&nbsp;	public Collection&lt;User&gt; findByNameIn(Collection&lt;String&gt; names);
+<i>14</i>&nbsp;	
+<i>15</i>&nbsp;	public Collection&lt;User&gt; findByCourses(Collection&lt;Course&gt; courses);
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-12-09 02:49</div>
+</div>
+</body>
+</html>

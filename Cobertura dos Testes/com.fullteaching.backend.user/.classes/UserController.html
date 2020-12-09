@@ -1,0 +1,267 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: UserController</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.fullteaching.backend.user</a> ]
+</div>
+
+<h1>Coverage Summary for Class: UserController (com.fullteaching.backend.user)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 63)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.fullteaching.backend.user;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+<i>4</i>&nbsp;import org.springframework.beans.factory.annotation.Value;
+<i>5</i>&nbsp;import org.springframework.http.HttpStatus;
+<i>6</i>&nbsp;import org.springframework.http.ResponseEntity;
+<i>7</i>&nbsp;import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+<i>8</i>&nbsp;import org.springframework.web.bind.annotation.RequestBody;
+<i>9</i>&nbsp;import org.springframework.web.bind.annotation.RequestMapping;
+<i>10</i>&nbsp;import org.springframework.web.bind.annotation.RequestMethod;
+<i>11</i>&nbsp;import org.springframework.web.bind.annotation.RestController;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;import java.io.BufferedReader;
+<i>14</i>&nbsp;import java.io.DataOutputStream;
+<i>15</i>&nbsp;import java.io.InputStreamReader;
+<i>16</i>&nbsp;import java.net.URL;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import javax.net.ssl.HttpsURLConnection;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;import org.apache.commons.validator.routines.EmailValidator;
+<i>21</i>&nbsp;import org.json.simple.JSONObject;
+<i>22</i>&nbsp;import org.json.simple.parser.JSONParser;
+<i>23</i>&nbsp;import org.slf4j.Logger;
+<i>24</i>&nbsp;import org.slf4j.LoggerFactory;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;import com.fullteaching.backend.user.UserRepository;
+<i>27</i>&nbsp;import com.fullteaching.backend.user.UserComponent;
+<i>28</i>&nbsp;import com.fullteaching.backend.security.AuthorizationService;
+<i>29</i>&nbsp;import com.fullteaching.backend.user.User;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;@RestController
+<i>33</i>&nbsp;@RequestMapping(&quot;/api-users&quot;)
+<b class="nc"><i>34</i>&nbsp;public class UserController {</b>
+<i>35</i>&nbsp;	
+<b class="nc"><i>36</i>&nbsp;	private static final Logger log = LoggerFactory.getLogger(UserController.class);</b>
+<i>37</i>&nbsp;	
+<i>38</i>&nbsp;	@Autowired
+<i>39</i>&nbsp;	private UserRepository userRepository;
+<i>40</i>&nbsp;	
+<i>41</i>&nbsp;	@Autowired
+<i>42</i>&nbsp;	private UserComponent user;
+<i>43</i>&nbsp;	
+<i>44</i>&nbsp;	@Autowired
+<i>45</i>&nbsp;	private AuthorizationService authorizationService;
+<i>46</i>&nbsp;	
+<i>47</i>&nbsp;    @Value(&quot;${recaptcha.private.key}&quot;)
+<i>48</i>&nbsp;    private String recaptchaPrivateKey;
+<i>49</i>&nbsp;	
+<i>50</i>&nbsp;	//Between 8-20 characters long, at least one uppercase, one lowercase and one number
+<b class="nc"><i>51</i>&nbsp;	private String passRegex = &quot;^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,20})$&quot;;</b>
+<i>52</i>&nbsp;	
+<i>53</i>&nbsp;	//userData: [name, pass, nickName, captchaToken]
+<i>54</i>&nbsp;	@RequestMapping(value = &quot;/new&quot;, method = RequestMethod.POST)
+<i>55</i>&nbsp;	public ResponseEntity&lt;User&gt; newUser(@RequestBody String[] userData) throws Exception {
+<i>56</i>&nbsp;		
+<b class="nc"><i>57</i>&nbsp;		log.info(&quot;Signing up a user...&quot;);</b>
+<i>58</i>&nbsp;		
+<b class="nc"><i>59</i>&nbsp;		if(this.validateGoogleCaptcha(userData[3])){</b>
+<i>60</i>&nbsp;		
+<i>61</i>&nbsp;			//If the email is not already in use
+<b class="nc"><i>62</i>&nbsp;			if(userRepository.findByName(userData[0]) == null) {</b>
+<i>63</i>&nbsp;				
+<i>64</i>&nbsp;				//If the password has a valid format (at least 8 characters long and contains one uppercase, one lowercase and a number)
+<b class="nc"><i>65</i>&nbsp;				if (userData[1].matches(this.passRegex)){</b>
+<i>66</i>&nbsp;					
+<i>67</i>&nbsp;					//If the email has a valid format
+<b class="nc"><i>68</i>&nbsp;					if (EmailValidator.getInstance().isValid(userData[0])){</b>
+<b class="nc"><i>69</i>&nbsp;						log.info(&quot;Email, password and captcha are valid&quot;);</b>
+<b class="nc"><i>70</i>&nbsp;						User newUser = new User(userData[0], userData[1], userData[2], &quot;&quot;, &quot;ROLE_STUDENT&quot;);</b>
+<b class="nc"><i>71</i>&nbsp;						userRepository.save(newUser);</b>
+<b class="nc"><i>72</i>&nbsp;						log.info(&quot;User successfully signed up&quot;);</b>
+<i>73</i>&nbsp;						
+<b class="nc"><i>74</i>&nbsp;						return new ResponseEntity&lt;&gt;(newUser, HttpStatus.CREATED);</b>
+<i>75</i>&nbsp;					}
+<i>76</i>&nbsp;					else{
+<b class="nc"><i>77</i>&nbsp;						log.error(&quot;Email NOT valid&quot;);</b>
+<b class="nc"><i>78</i>&nbsp;						return new ResponseEntity&lt;&gt;(HttpStatus.FORBIDDEN);</b>
+<i>79</i>&nbsp;					}
+<i>80</i>&nbsp;				}
+<i>81</i>&nbsp;				
+<i>82</i>&nbsp;				else{
+<b class="nc"><i>83</i>&nbsp;					log.error(&quot;Password NOT valid&quot;);</b>
+<b class="nc"><i>84</i>&nbsp;					return new ResponseEntity&lt;&gt;(HttpStatus.BAD_REQUEST);</b>
+<i>85</i>&nbsp;				}
+<i>86</i>&nbsp;				
+<i>87</i>&nbsp;			} else {
+<b class="nc"><i>88</i>&nbsp;				log.error(&quot;Email already in use&quot;);</b>
+<b class="nc"><i>89</i>&nbsp;				return new ResponseEntity&lt;&gt;(HttpStatus.CONFLICT);</b>
+<i>90</i>&nbsp;			}
+<i>91</i>&nbsp;		}
+<i>92</i>&nbsp;		else{
+<b class="nc"><i>93</i>&nbsp;			log.error(&quot;Captcha not validated&quot;);</b>
+<b class="nc"><i>94</i>&nbsp;			return new ResponseEntity&lt;&gt;(HttpStatus.UNAUTHORIZED);</b>
+<i>95</i>&nbsp;		}
+<i>96</i>&nbsp;	}
+<i>97</i>&nbsp;	
+<i>98</i>&nbsp;	//userData: [oldPassword, newPassword]
+<i>99</i>&nbsp;	@RequestMapping(value = &quot;/changePassword&quot;, method = RequestMethod.PUT)
+<i>100</i>&nbsp;	public ResponseEntity&lt;Object&gt; changePassword(@RequestBody String[] userData) {
+<i>101</i>&nbsp;		
+<b class="nc"><i>102</i>&nbsp;		log.info(&quot;Updating password...&quot;);</b>
+<i>103</i>&nbsp;		
+<b class="nc"><i>104</i>&nbsp;		ResponseEntity&lt;Object&gt; authorized = authorizationService.checkBackendLogged();</b>
+<b class="nc"><i>105</i>&nbsp;		if (authorized != null){</b>
+<b class="nc"><i>106</i>&nbsp;			return authorized;</b>
+<i>107</i>&nbsp;		};
+<i>108</i>&nbsp;		
+<b class="nc"><i>109</i>&nbsp;		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();</b>
+<i>110</i>&nbsp;		
+<i>111</i>&nbsp;		//If the stored current password and the given current password match
+<b class="nc"><i>112</i>&nbsp;		if(encoder.matches(userData[0], user.getLoggedUser().getPasswordHash())) {</b>
+<i>113</i>&nbsp;			
+<i>114</i>&nbsp;			//If the password has a valid format (at least 8 characters long and contains one uppercase, one lowercase and a number)
+<b class="nc"><i>115</i>&nbsp;			if (userData[1].matches(this.passRegex)){</b>
+<b class="nc"><i>116</i>&nbsp;				User modifiedUser = userRepository.findByName(user.getLoggedUser().getName());</b>
+<b class="nc"><i>117</i>&nbsp;				modifiedUser.setPasswordHash(encoder.encode(userData[1]));</b>
+<b class="nc"><i>118</i>&nbsp;				userRepository.save(modifiedUser);</b>
+<i>119</i>&nbsp;				
+<b class="nc"><i>120</i>&nbsp;				log.info(&quot;Password successfully updated&quot;);</b>
+<i>121</i>&nbsp;				
+<b class="nc"><i>122</i>&nbsp;				return new ResponseEntity&lt;&gt;(true, HttpStatus.OK);</b>
+<i>123</i>&nbsp;			}
+<i>124</i>&nbsp;			else{
+<b class="nc"><i>125</i>&nbsp;				log.error(&quot;New password NOT valid&quot;);</b>
+<b class="nc"><i>126</i>&nbsp;				return new ResponseEntity&lt;&gt;(HttpStatus.NOT_MODIFIED);</b>
+<i>127</i>&nbsp;			}
+<i>128</i>&nbsp;		} else {
+<b class="nc"><i>129</i>&nbsp;			log.error(&quot;Invalid current password&quot;);</b>
+<b class="nc"><i>130</i>&nbsp;			return new ResponseEntity&lt;&gt;(HttpStatus.CONFLICT);</b>
+<i>131</i>&nbsp;		}
+<i>132</i>&nbsp;	}
+<i>133</i>&nbsp;	
+<i>134</i>&nbsp;	private boolean validateGoogleCaptcha(String token) throws Exception{
+<i>135</i>&nbsp;		
+<b class="nc"><i>136</i>&nbsp;		log.info(&quot;Validating Google Captcha&quot;);</b>
+<i>137</i>&nbsp;		
+<b class="nc"><i>138</i>&nbsp;		String url = &quot;https://www.google.com/recaptcha/api/siteverify&quot;;</b>
+<b class="nc"><i>139</i>&nbsp;		URL obj = new URL(url);</b>
+<b class="nc"><i>140</i>&nbsp;		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();</b>
+<i>141</i>&nbsp;
+<i>142</i>&nbsp;		//Add request header
+<b class="nc"><i>143</i>&nbsp;		con.setRequestMethod(&quot;POST&quot;);</b>
+<i>144</i>&nbsp;
+<b class="nc"><i>145</i>&nbsp;		String urlParameters  = &quot;secret=&quot; + this.recaptchaPrivateKey + &quot;&amp;response=&quot; + token;</b>
+<i>146</i>&nbsp;
+<i>147</i>&nbsp;		//Send post request
+<b class="nc"><i>148</i>&nbsp;		con.setDoOutput(true);</b>
+<b class="nc"><i>149</i>&nbsp;		DataOutputStream wr = new DataOutputStream(con.getOutputStream());</b>
+<b class="nc"><i>150</i>&nbsp;		wr.writeBytes(urlParameters);</b>
+<b class="nc"><i>151</i>&nbsp;		wr.flush();</b>
+<b class="nc"><i>152</i>&nbsp;		wr.close();</b>
+<i>153</i>&nbsp;
+<b class="nc"><i>154</i>&nbsp;		int responseCode = con.getResponseCode();</b>
+<i>155</i>&nbsp;
+<b class="nc"><i>156</i>&nbsp;		BufferedReader in = new BufferedReader(</b>
+<b class="nc"><i>157</i>&nbsp;		        new InputStreamReader(con.getInputStream()));</b>
+<i>158</i>&nbsp;		String inputLine;
+<b class="nc"><i>159</i>&nbsp;		StringBuffer response = new StringBuffer();</b>
+<i>160</i>&nbsp;
+<b class="nc"><i>161</i>&nbsp;		while ((inputLine = in.readLine()) != null)</b>
+<i>162</i>&nbsp;		{
+<b class="nc"><i>163</i>&nbsp;			response.append(inputLine);</b>
+<i>164</i>&nbsp;		}
+<b class="nc"><i>165</i>&nbsp;		in.close();</b>
+<i>166</i>&nbsp;
+<i>167</i>&nbsp;		//Print result
+<b class="nc"><i>168</i>&nbsp;		log.debug(&quot;Response: {}&quot;, response.toString());</b>
+<i>169</i>&nbsp;		
+<b class="nc"><i>170</i>&nbsp;		JSONParser parser = new JSONParser();</b>
+<b class="nc"><i>171</i>&nbsp;		JSONObject json = (JSONObject) parser.parse(response.toString());</b>
+<i>172</i>&nbsp;		
+<b class="nc"><i>173</i>&nbsp;		boolean successCaptchaResponse = (boolean) json.get(&quot;success&quot;);</b>
+<i>174</i>&nbsp;		
+<b class="nc"><i>175</i>&nbsp;		if (successCaptchaResponse) {</b>
+<b class="nc"><i>176</i>&nbsp;			log.info(&quot;Captcha response successful&quot;);</b>
+<i>177</i>&nbsp;		} else {
+<b class="nc"><i>178</i>&nbsp;			log.error(&quot;Captcha invalid&quot;);</b>
+<i>179</i>&nbsp;		}
+<i>180</i>&nbsp;		
+<b class="nc"><i>181</i>&nbsp;		return successCaptchaResponse;</b>
+<i>182</i>&nbsp;	}
+<i>183</i>&nbsp;
+<i>184</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-12-09 02:49</div>
+</div>
+</body>
+</html>
