@@ -9,7 +9,7 @@ Meu teste foi realizado 3 vezes. A primeira vez com 10 Threads, a segunda vez co
 <p align="center"><img src="https://github.com/SDuboc/full-teaching/blob/teste-sistema-jmeter/ReadmeImages/TesteJMeter.png"/></p>
 
 #### Segundo teste: 100 Threads
-<p align="center"><img src="https://github.com/SDuboc/full-teaching/blob/teste-sistema-jmeter/ReadmeImages_100/TesteJMeter.png"/></p>
+<p align="center"><img src="https://github.com/SDuboc/full-teaching/blob/teste-sistema-jmeter/ReadmeImages/TesteJMeter_100.png"/></p>
 
 #### Terceiro teste: 1000 Threads
-<p align="center"><img src="https://github.com/SDuboc/full-teaching/blob/teste-sistema-jmeter/ReadmeImages_1000/TesteJMeter.png"/></p>
+<p align="center"><img src="https://github.com/SDuboc/full-teaching/blob/teste-sistema-jmeter/ReadmeImages/TesteJMeter_1000.png"/></p>
