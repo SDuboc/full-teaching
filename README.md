@@ -1,6 +1,6 @@
 # FullTeaching
 
-### Branch específica para demontrar o que foi realizado no teste integrado
+### Branch específica para demonstrar o que foi realizado no teste integrado
 
 Public link da collection criada no postman: https://www.getpostman.com/collections/f7aca313ac99507f5732
 
